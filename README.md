@@ -1,1 +1,1 @@
-message-encdcc-using-ecc-aes-rsa.streamlit.app
+ecc-aes-rsa.streamlit.app
