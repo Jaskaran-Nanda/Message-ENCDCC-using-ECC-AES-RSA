@@ -7,7 +7,7 @@ from tinyec.ec import Point
 import hashlib
 import secrets
 import base64
-
+import time
 
 
 def create_copy_button(text_to_copy):
@@ -139,7 +139,9 @@ if role == "Sender":
                                             int.from_bytes(receiver_ecc_public_key_bytes[32:], 'big'))
             receiver_rsa_public_key = base64.b64decode(receiver_rsa_key_input)
 
+            start_time = time.time()
             nonce, tag, ciphertext, enc_aes_key = encrypt_message(message, receiver_ecc_public_key, receiver_rsa_public_key)
+            encryption_time = time.time() - start_time
             store_message(sender_key, receiver_key_input, nonce, tag, ciphertext, enc_aes_key)
             st.success("Message sent successfully!")
 
@@ -157,7 +159,9 @@ if role == "Sender":
                 add_text7=st.markdown("## ENC AES key:")
                 add_text7_info=st.info(f"{enc_aes_key}")
                 add_text8=st.markdown("## Nonce:")
-                add_text6_info=st.info(f"{nonce}")
+                add_text8_info=st.info(f"{nonce}")
+                add_text9=st.markdown("# Encryption Time:")
+                add_text10=st.info(f"{encryption_time} seconds")
 
         except Exception as e:
             st.error(f"Failed to send message: {e}")
@@ -196,12 +200,16 @@ elif role == "Receiver":
                     rsa_private_key = keys["rsa_private"]
 
                     try:
+                        start_time2 = time.time()
                         plaintext = decrypt_message(enc_msg, ecc_private_key, rsa_private_key)
+                        decryption_time = time.time() - start_time2
                         with st.sidebar:
                             add_sender=st.markdown("## Message from:")
                             add_sender=st.info(f"{sender_key}")
                             add_ciphertext=st.markdown("## Ciphertext:")
                             add_ciphertext=st.info(f"{base64.b64encode(ciphertext).decode('utf-8')}")
+                            add_dec_time=st.markdown("## Decryption time:")
+                            add_dec_time_info=st.info(f"{decryption_time} seconds")
                         st.text_area("Decrypted Message", plaintext)
                     except Exception as e:
                         st.error(f"Failed to decrypt a message: {e}")
